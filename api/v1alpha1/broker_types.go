@@ -28,8 +28,11 @@ type BrokerSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 
-	// Foo is an example field of Broker. Edit broker_types.go to remove/update
-	Foo string `json:"foo,omitempty"`
+	Components                  []string `json:"components,omitempty"`
+	DefaultCustomDomains        []string `json:"defaultCustomDomains,omitempty"`
+	GlobalnetCIDRRange          string   `json:"globalnetCIDRRange,omitempty"`
+	DefaultGlobalnetClusterSize uint     `json:"defaultGlobalnetClusterSize,omitempty"`
+	GlobalnetEnabled            bool     `json:"globalnetEnabled,omitempty"`
 }
 
 // BrokerStatus defines the observed state of Broker
@@ -40,6 +43,8 @@ type BrokerStatus struct {
 
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
+// +kubebuilder:resource:path=brokers,scope=Namespaced
+// +genclient
 
 // Broker is the Schema for the brokers API
 type Broker struct {
