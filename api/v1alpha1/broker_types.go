@@ -24,6 +24,7 @@ import (
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
 // BrokerSpec defines the desired state of Broker
+// +k8s:openapi-gen=true
 type BrokerSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
@@ -36,6 +37,7 @@ type BrokerSpec struct {
 }
 
 // BrokerStatus defines the observed state of Broker
+// +k8s:openapi-gen=true
 type BrokerStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
@@ -47,6 +49,7 @@ type BrokerStatus struct {
 // +genclient
 
 // Broker is the Schema for the brokers API
+// +k8s:openapi-gen=true
 type Broker struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
