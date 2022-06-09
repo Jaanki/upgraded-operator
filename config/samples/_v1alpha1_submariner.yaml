@@ -1,0 +1,6 @@
+apiVersion: submariner.io/v1alpha1
+kind: Submariner
+metadata:
+  name: submariner-sample
+spec:
+  # TODO(user): Add fields here
