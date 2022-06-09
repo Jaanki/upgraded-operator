@@ -3,11 +3,12 @@ module github.com/submariner-io/submariner-operator
 go 1.17
 
 require (
-	github.com/go-logr/logr v1.2.0
+	github.com/go-logr/logr v1.2.2
 	github.com/onsi/ginkgo v1.16.5
 	github.com/onsi/gomega v1.19.0
 	github.com/pkg/errors v0.9.1
 	github.com/submariner-io/admiral v0.13.0-m2
+	github.com/submariner-io/submariner v0.13.0-m2.0.20220608112640-7f4a6a79da0d
 	golang.org/x/text v0.3.7
 	k8s.io/api v0.23.5
 	k8s.io/apiextensions-apiserver v0.23.5
@@ -35,7 +36,7 @@ require (
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
-	github.com/google/go-cmp v0.5.5 // indirect
+	github.com/google/go-cmp v0.5.6 // indirect
 	github.com/google/gofuzz v1.2.0 // indirect
 	github.com/google/uuid v1.2.0 // indirect
 	github.com/googleapis/gnostic v0.5.5 // indirect
