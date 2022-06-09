@@ -26,6 +26,8 @@ import (
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
+// +k8s:openapi-gen=true
+
 // SubmarinerSpec defines the desired state of Submariner
 type SubmarinerSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
@@ -66,6 +68,8 @@ type SubmarinerSpec struct {
 	ConnectionHealthCheck *HealthCheckSpec `json:"connectionHealthCheck,omitempty"`
 }
 
+// +k8s:openapi-gen=true
+
 // SubmarinerStatus defines the observed state of Submariner
 type SubmarinerStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
@@ -85,61 +89,11 @@ type SubmarinerStatus struct {
 	DeploymentInfo            DeploymentInfo          `json:"deploymentInfo,omitempty"`
 }
 
-// TODO (Janki) Move this to SD API definition
-type CoreDNSCustomConfig struct {
-	ConfigMapName string `json:"configMapName,omitempty"`
-	Namespace     string `json:"namespace,omitempty"`
-}
-
-type LoadBalancerStatus struct {
-	Status *corev1.LoadBalancerStatus `json:"status,omitempty"`
-}
-
-type DaemonSetStatus struct {
-	LastResourceVersion       string                   `json:"lastResourceVersion,omitempty"`
-	Status                    *appsv1.DaemonSetStatus  `json:"status,omitempty"`
-	NonReadyContainerStates   *[]corev1.ContainerState `json:"nonReadyContainerStates,omitempty"`
-	MismatchedContainerImages bool                     `json:"mismatchedContainerImages"`
-}
-
-type DeploymentInfo struct {
-	KubernetesType        KubernetesType `json:"kubernetesType,omitempty"`
-	KubernetesTypeVersion string         `json:"kubernetesTypeVersion,omitempty"`
-	KubernetesVersion     string         `json:"kubernetesVersion,omitempty"`
-	CloudProvider         CloudProvider  `json:"cloudProvider,omitempty"`
-}
-
-type HealthCheckSpec struct {
-	Enabled bool `json:"enabled,omitempty"`
-	// The interval at which health check pings are sent.
-	IntervalSeconds uint64 `json:"intervalSeconds,omitempty"`
-	// The maximum number of packets lost at which the health checker will mark the connection as down.
-	MaxPacketLossCount uint64 `json:"maxPacketLossCount,omitempty"`
-}
-
-type (
-	KubernetesType string
-	CloudProvider  string
-)
-
-const (
-	K8s                   KubernetesType = "k8s"
-	OCP                                  = "ocp"
-	EKS                                  = "eks"
-	AKS                                  = "aks"
-	GKE                                  = "gke"
-	DefaultKubernetesType                = K8s
-	Kind                  CloudProvider  = "kind"
-	AWS                                  = "aws"
-	GCP                                  = "gcp"
-	Azure                                = "azure"
-	Openstack                            = "openstack"
-)
-
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
 // +kubebuilder:resource:path=submariners,scope=Namespaced
 // +genclient
+// +k8s:openapi-gen=true
 
 // Submariner is the Schema for the submariners API
 type Submariner struct {
