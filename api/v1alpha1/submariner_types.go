@@ -162,3 +162,54 @@ type SubmarinerList struct {
 func init() {
 	SchemeBuilder.Register(&Submariner{}, &SubmarinerList{})
 }
+
+// TODO (Janki) Move this to SD API definition
+type CoreDNSCustomConfig struct {
+	ConfigMapName string `json:"configMapName,omitempty"`
+	Namespace     string `json:"namespace,omitempty"`
+}
+
+type LoadBalancerStatus struct {
+	Status *corev1.LoadBalancerStatus `json:"status,omitempty"`
+}
+
+type DaemonSetStatus struct {
+	LastResourceVersion       string                   `json:"lastResourceVersion,omitempty"`
+	Status                    *appsv1.DaemonSetStatus  `json:"status,omitempty"`
+	NonReadyContainerStates   *[]corev1.ContainerState `json:"nonReadyContainerStates,omitempty"`
+	MismatchedContainerImages bool                     `json:"mismatchedContainerImages"`
+}
+
+type DeploymentInfo struct {
+	KubernetesType        KubernetesType `json:"kubernetesType,omitempty"`
+	KubernetesTypeVersion string         `json:"kubernetesTypeVersion,omitempty"`
+	KubernetesVersion     string         `json:"kubernetesVersion,omitempty"`
+	CloudProvider         CloudProvider  `json:"cloudProvider,omitempty"`
+}
+
+type HealthCheckSpec struct {
+	Enabled bool `json:"enabled,omitempty"`
+	// The interval at which health check pings are sent.
+	IntervalSeconds uint64 `json:"intervalSeconds,omitempty"`
+	// The maximum number of packets lost at which the health checker will mark the connection as down.
+	MaxPacketLossCount uint64 `json:"maxPacketLossCount,omitempty"`
+}
+
+type (
+	KubernetesType string
+	CloudProvider  string
+)
+
+const (
+	K8s                   KubernetesType = "k8s"
+	OCP                                  = "ocp"
+	EKS                                  = "eks"
+	AKS                                  = "aks"
+	GKE                                  = "gke"
+	DefaultKubernetesType                = K8s
+	Kind                  CloudProvider  = "kind"
+	AWS                                  = "aws"
+	GCP                                  = "gcp"
+	Azure                                = "azure"
+	Openstack                            = "openstack"
+)
