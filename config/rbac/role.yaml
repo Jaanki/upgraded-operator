@@ -31,3 +31,29 @@ rules:
   - get
   - patch
   - update
+- apiGroups:
+  - submariner.io
+  resources:
+  - submariners
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - submariner.io
+  resources:
+  - submariners/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - submariner.io
+  resources:
+  - submariners/status
+  verbs:
+  - get
+  - patch
+  - update
