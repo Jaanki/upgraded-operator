@@ -19,6 +19,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/submariner-io/submariner-operator/controllers/submariner"
 	"os"
 
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
@@ -96,7 +97,7 @@ func main() {
 		setupLog.Error(err, "unable to create controller", "controller", "Broker")
 		os.Exit(1)
 	}
-	if err = (&controllers.SubmarinerReconciler{
+	if err = (&submariner.Reconciler{
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
 	}).SetupWithManager(mgr); err != nil {
