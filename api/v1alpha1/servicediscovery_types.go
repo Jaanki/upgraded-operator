@@ -27,19 +27,35 @@ import (
 type ServiceDiscoverySpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
-
-	// Foo is an example field of ServiceDiscovery. Edit servicediscovery_types.go to remove/update
-	Foo string `json:"foo,omitempty"`
+	BrokerK8sApiServer       string               `json:"brokerK8sApiServer"`
+	BrokerK8sApiServerToken  string               `json:"brokerK8sApiServerToken,omitempty"`
+	BrokerK8sCA              string               `json:"brokerK8sCA,omitempty"`
+	BrokerK8sSecret          string               `json:"brokerK8sSecret,omitempty"`
+	BrokerK8sRemoteNamespace string               `json:"brokerK8sRemoteNamespace"`
+	ClusterID                string               `json:"clusterID"`
+	Namespace                string               `json:"namespace"`
+	Repository               string               `json:"repository,omitempty"`
+	Version                  string               `json:"version,omitempty"`
+	Debug                    bool                 `json:"debug"`
+	GlobalnetEnabled         bool                 `json:"globalnetEnabled,omitempty"`
+	BrokerK8sInsecure        bool                 `json:"brokerK8sInsecure,omitempty"`
+	CoreDNSCustomConfig      *CoreDNSCustomConfig `json:"coreDNSCustomConfig,omitempty"`
+	// +listType=set
+	CustomDomains  []string          `json:"customDomains,omitempty"`
+	ImageOverrides map[string]string `json:"imageOverrides,omitempty"`
 }
 
 // ServiceDiscoveryStatus defines the observed state of ServiceDiscovery
 type ServiceDiscoveryStatus struct {
+	DeploymentInfo DeploymentInfo `json:"deploymentInfo,omitempty"`
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 }
 
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
+// +kubebuilder:resource:path=servicediscoveries,scope=Namespaced
+// +genclient
 
 // ServiceDiscovery is the Schema for the servicediscoveries API
 type ServiceDiscovery struct {
