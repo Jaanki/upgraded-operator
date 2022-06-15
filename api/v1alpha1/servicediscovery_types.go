@@ -23,6 +23,8 @@ import (
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
+// +k8s:openapi-gen=true
+
 // ServiceDiscoverySpec defines the desired state of ServiceDiscovery
 type ServiceDiscoverySpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
@@ -45,6 +47,8 @@ type ServiceDiscoverySpec struct {
 	ImageOverrides map[string]string `json:"imageOverrides,omitempty"`
 }
 
+// +k8s:openapi-gen=true
+
 // ServiceDiscoveryStatus defines the observed state of ServiceDiscovery
 type ServiceDiscoveryStatus struct {
 	DeploymentInfo DeploymentInfo `json:"deploymentInfo,omitempty"`
@@ -56,6 +60,7 @@ type ServiceDiscoveryStatus struct {
 //+kubebuilder:subresource:status
 // +kubebuilder:resource:path=servicediscoveries,scope=Namespaced
 // +genclient
+// +k8s:openapi-gen=true
 
 // ServiceDiscovery is the Schema for the servicediscoveries API
 type ServiceDiscovery struct {
