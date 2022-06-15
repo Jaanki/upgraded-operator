@@ -19,5 +19,7 @@ limitations under the License.
 package v1alpha1
 
 var (
+	DefaultRepo                      = "quay.io/submariner"
 	DefaultSubmarinerOperatorVersion = "0.13.0-m2"
+	DefaultSubmarinerVersion         = "0.13.0-m2"
 )
