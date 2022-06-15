@@ -20,6 +20,7 @@ package submariner
 
 import (
 	"context"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"time"
 
 	"github.com/submariner-io/admiral/pkg/finalizer"
@@ -104,8 +105,6 @@ func (r *Reconciler) removeFinalizer(ctx context.Context, instance *operatorv1al
 		instance, constants.CleanupFinalizer)
 }
 
-//TODO (Jaanki) Adding this after adding SD API
-/*
 func (r *Reconciler) ensureServiceDiscoveryDeleted(ctx context.Context, namespace string) bool {
 	err := r.config.Client.Delete(ctx, newServiceDiscoveryCR(namespace))
 	if apierrors.IsNotFound(err) {
@@ -120,7 +119,6 @@ func (r *Reconciler) ensureServiceDiscoveryDeleted(ctx context.Context, namespac
 
 	return true
 }
-*/
 
 func newDaemonSet(name, namespace string) *appsv1.DaemonSet {
 	return &appsv1.DaemonSet{

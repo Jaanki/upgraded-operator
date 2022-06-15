@@ -83,3 +83,8 @@ type ServiceDiscoveryList struct {
 func init() {
 	SchemeBuilder.Register(&ServiceDiscovery{}, &ServiceDiscoveryList{})
 }
+
+type CoreDNSCustomConfig struct {
+	ConfigMapName string `json:"configMapName,omitempty"`
+	Namespace     string `json:"namespace,omitempty"`
+}

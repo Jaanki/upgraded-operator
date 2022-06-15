@@ -117,12 +117,6 @@ func init() {
 	SchemeBuilder.Register(&Submariner{}, &SubmarinerList{})
 }
 
-// TODO (Janki) Move this to SD API definition
-type CoreDNSCustomConfig struct {
-	ConfigMapName string `json:"configMapName,omitempty"`
-	Namespace     string `json:"namespace,omitempty"`
-}
-
 type LoadBalancerStatus struct {
 	Status *corev1.LoadBalancerStatus `json:"status,omitempty"`
 }

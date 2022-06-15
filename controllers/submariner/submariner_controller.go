@@ -187,10 +187,9 @@ func (r *Reconciler) Reconcile(ctx context.Context, request reconcile.Request) (
 		return reconcile.Result{}, err
 	}
 
-	//TODO (Jaanki) Revisit after adding SD API
-	//if err := r.serviceDiscoveryReconciler(ctx, instance, reqLogger, instance.Spec.ServiceDiscoveryEnabled); err != nil {
-	//	return reconcile.Result{}, err
-	//}
+	if err := r.serviceDiscoveryReconciler(ctx, instance, reqLogger, instance.Spec.ServiceDiscoveryEnabled); err != nil {
+		return reconcile.Result{}, err
+	}
 
 	//TODO (Jaanki) Revisit while adding metrics
 	/*

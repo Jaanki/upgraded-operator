@@ -52,7 +52,6 @@ spec:
               clusterID:
                 type: string
               coreDNSCustomConfig:
-                description: TODO (Janki) Move this to SD API definition
                 properties:
                   configMapName:
                     type: string

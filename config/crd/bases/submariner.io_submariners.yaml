@@ -86,7 +86,6 @@ spec:
                     type: integer
                 type: object
               coreDNSCustomConfig:
-                description: TODO (Janki) Move this to SD API definition
                 properties:
                   configMapName:
                     type: string
@@ -176,7 +175,7 @@ spec:
                           description: Details about a terminated container
                           properties:
                             containerID:
-                              description: Container's ID in the format 'docker://<container_id>'
+                              description: Container's ID in the format '<type>://<container_id>'
                               type: string
                             exitCode:
                               description: Exit status from the last termination of
@@ -471,7 +470,7 @@ spec:
                           description: Details about a terminated container
                           properties:
                             containerID:
-                              description: Container's ID in the format 'docker://<container_id>'
+                              description: Container's ID in the format '<type>://<container_id>'
                               type: string
                             exitCode:
                               description: Exit status from the last termination of
@@ -706,7 +705,7 @@ spec:
                           description: Details about a terminated container
                           properties:
                             containerID:
-                              description: Container's ID in the format 'docker://<container_id>'
+                              description: Container's ID in the format '<type>://<container_id>'
                               type: string
                             exitCode:
                               description: Exit status from the last termination of

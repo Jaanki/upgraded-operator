@@ -206,11 +206,11 @@ func (r *Reconciler) ensureLightHouseAgent(instance *v1alpha1.ServiceDiscovery, 
 
 	//TODO (Jaanki) Revisit this while adding metrics
 	/*
-	err := metrics.Setup(instance.Namespace, instance, lightHouseAgent.GetLabels(), 8082, r.config.Client,
-		r.config.RestConfig, r.config.Scheme, reqLogger)
-	if err != nil {
-		return errors.Wrap(err, "error setting up metrics")
-	}
+		err := metrics.Setup(instance.Namespace, instance, lightHouseAgent.GetLabels(), 8082, r.config.Client,
+			r.config.RestConfig, r.config.Scheme, reqLogger)
+		if err != nil {
+			return errors.Wrap(err, "error setting up metrics")
+		}
 	*/
 
 	return nil
@@ -226,12 +226,12 @@ func (r *Reconciler) ensureLighthouseCoreDNSDeployment(instance *v1alpha1.Servic
 
 	//TODO (Jaanki) Revisit this while adding metrics
 	/*
-	err := metrics.Setup(instance.Namespace, instance, lighthouseCoreDNSDeployment.GetLabels(), 9153, r.config.Client, r.config.RestConfig,
-		r.config.Scheme, reqLogger)
-	if err != nil {
-		return errors.Wrap(err, "error setting up coredns metrics")
-	}
-	 */
+		err := metrics.Setup(instance.Namespace, instance, lighthouseCoreDNSDeployment.GetLabels(), 9153, r.config.Client, r.config.RestConfig,
+			r.config.Scheme, reqLogger)
+		if err != nil {
+			return errors.Wrap(err, "error setting up coredns metrics")
+		}
+	*/
 
 	return nil
 }
