@@ -39,10 +39,6 @@ func (r *Reconciler) reconcileGlobalnetDaemonSet(instance *v1alpha1.Submariner, 
 		return nil, err
 	}
 
-	// TODO (Jaanki) Check when implementing metrics
-	//err = metrics.Setup(instance.Namespace, instance, daemonSet.GetLabels(), globalnetMetricsServerPort,
-	//	r.config.Client, r.config.RestConfig, r.config.Scheme, reqLogger)
-
 	return daemonSet, err
 }
 

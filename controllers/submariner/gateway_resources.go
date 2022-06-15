@@ -251,15 +251,9 @@ func (r *Reconciler) reconcileGatewayDaemonSet(
 		return nil, err
 	}
 
-	//TODO (Jaanki) Revisit this while adding metrics
-	//err = metrics.Setup(instance.Namespace, instance, daemonSet.GetLabels(), gatewayMetricsServerPort, r.config.Client,
-	//	r.config.RestConfig, r.config.Scheme, reqLogger)
-
 	return daemonSet, err
 }
 
-//TODO (Jaanki) Revisit this while adding metrics
-/*
 func buildGatewayStatusAndUpdateMetrics(gateways []submarinerv1.Gateway) []submarinerv1.GatewayStatus {
 	gatewayStatuses := []submarinerv1.GatewayStatus{}
 
@@ -289,7 +283,6 @@ func buildGatewayStatusAndUpdateMetrics(gateways []submarinerv1.Gateway) []subma
 
 	return gatewayStatuses
 }
-*/
 
 func (r *Reconciler) retrieveGateways(ctx context.Context, owner metav1.Object,
 	namespace string,

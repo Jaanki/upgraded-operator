@@ -204,15 +204,6 @@ func (r *Reconciler) ensureLightHouseAgent(instance *v1alpha1.ServiceDiscovery, 
 		return errors.Wrap(err, "error reconciling agent deployment")
 	}
 
-	//TODO (Jaanki) Revisit this while adding metrics
-	/*
-		err := metrics.Setup(instance.Namespace, instance, lightHouseAgent.GetLabels(), 8082, r.config.Client,
-			r.config.RestConfig, r.config.Scheme, reqLogger)
-		if err != nil {
-			return errors.Wrap(err, "error setting up metrics")
-		}
-	*/
-
 	return nil
 }
 
@@ -223,15 +214,6 @@ func (r *Reconciler) ensureLighthouseCoreDNSDeployment(instance *v1alpha1.Servic
 		log.Error(err, "Error creating the lighthouseCoreDNS deployment")
 		return errors.Wrap(err, "error reconciling coredns deployment")
 	}
-
-	//TODO (Jaanki) Revisit this while adding metrics
-	/*
-		err := metrics.Setup(instance.Namespace, instance, lighthouseCoreDNSDeployment.GetLabels(), 9153, r.config.Client, r.config.RestConfig,
-			r.config.Scheme, reqLogger)
-		if err != nil {
-			return errors.Wrap(err, "error setting up coredns metrics")
-		}
-	*/
 
 	return nil
 }

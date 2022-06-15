@@ -191,23 +191,20 @@ func (r *Reconciler) Reconcile(ctx context.Context, request reconcile.Request) (
 		return reconcile.Result{}, err
 	}
 
-	//TODO (Jaanki) Revisit while adding metrics
-	/*
-		// Retrieve the gateway information
-		gateways, err := r.retrieveGateways(ctx, instance, request.Namespace)
-		if err != nil {
-			// Not fatal
-			log.Error(err, "error retrieving gateways")
-		}
+    // Retrieve the gateway information
+	gateways, err := r.retrieveGateways(ctx, instance, request.Namespace)
+	if err != nil {
+		// Not fatal
+		log.Error(err, "error retrieving gateways")
+	}
 
-		gatewayStatuses := buildGatewayStatusAndUpdateMetrics(gateways)
-	*/
+	gatewayStatuses := buildGatewayStatusAndUpdateMetrics(gateways)
 
 	instance.Status.NatEnabled = instance.Spec.NatEnabled
 	instance.Status.ColorCodes = instance.Spec.ColorCodes
 	instance.Status.ClusterID = instance.Spec.ClusterID
 	instance.Status.GlobalCIDR = instance.Spec.GlobalCIDR
-	//instance.Status.Gateways = &gatewayStatuses
+	instance.Status.Gateways = &gatewayStatuses
 
 	err = updateDaemonSetStatus(ctx, r.config.Client, gatewayDaemonSet, &instance.Status.GatewayDaemonSetStatus, request.Namespace)
 	if err != nil {
