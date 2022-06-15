@@ -1,9 +1,80 @@
-# VERSION defines the project version for the bundle.
-# Update this value when you upgrade the version of your project.
-# To re-generate a bundle for another specific version without changing the standard setup, you can:
-# - use the VERSION as arg of the bundle target (e.g make bundle VERSION=0.0.2)
-# - use environment variables to overwrite this value (e.g export VERSION=0.0.2)
-VERSION ?= 0.0.1
+BASE_BRANCH ?= devel
+# Denotes the default operator image version, exposed as a variable for the automated release
+DEFAULT_IMAGE_VERSION ?= $(BASE_BRANCH)
+export BASE_BRANCH
+export DEFAULT_IMAGE_VERSION
+
+# Define LOCAL_BUILD to build directly on the host and not inside a Dapper container
+ifdef LOCAL_BUILD
+DAPPER_HOST_ARCH ?= $(shell go env GOHOSTARCH)
+SHIPYARD_DIR ?= ../shipyard
+SCRIPTS_DIR ?= $(SHIPYARD_DIR)/scripts/shared
+
+export DAPPER_HOST_ARCH
+export SHIPYARD_DIR
+export SCRIPTS_DIR
+endif
+
+ifneq (,$(DAPPER_HOST_ARCH))
+
+OPERATOR_SDK_VERSION := 1.21.1
+OPERATOR_SDK := $(CURDIR)/bin/operator-sdk
+
+KUSTOMIZE_VERSION := 3.10.0
+KUSTOMIZE := $(CURDIR)/bin/kustomize
+
+CONTROLLER_GEN := $(CURDIR)/bin/controller-gen
+
+# Running in Dapper
+
+# Semantic versioning regex
+PATTERN := ^([0-9]|[1-9][0-9]*)\.([0-9]|[1-9][0-9]*)\.([0-9]|[1-9][0-9]*)$
+# Test if VERSION matches the semantic versioning rule
+IS_SEMANTIC_VERSION = $(shell [[ $(or $(BUNDLE_VERSION),$(VERSION),'undefined') =~ $(PATTERN) ]] && echo true || echo false)
+
+IMAGES = submariner-operator submariner-operator-index
+PRELOAD_IMAGES := $(IMAGES) submariner-gateway submariner-globalnet submariner-route-agent lighthouse-agent lighthouse-coredns
+undefine SKIP
+undefine FOCUS
+undefine E2E_TESTDIR
+
+ifneq (,$(filter ovn,$(_using)))
+SETTINGS = $(DAPPER_SOURCE)/.shipyard.e2e.ovn.yml
+else
+SETTINGS = $(DAPPER_SOURCE)/.shipyard.e2e.yml
+endif
+
+include $(SHIPYARD_DIR)/Makefile.inc
+
+override E2E_ARGS += --settings $(SETTINGS) cluster1 cluster2
+export DEPLOY_ARGS
+override UNIT_TEST_ARGS += test internal/env
+override VALIDATE_ARGS += --skip-dirs pkg/client
+
+# Process extra flags from the `using=a,b,c` optional flag
+
+ifneq (,$(filter lighthouse,$(_using)))
+override DEPLOY_ARGS += --deploytool_broker_args '--components service-discovery,connectivity'
+endif
+
+GO ?= go
+GOARCH = $(shell $(GO) env GOARCH)
+GOEXE = $(shell $(GO) env GOEXE)
+GOOS = $(shell $(GO) env GOOS)
+
+# Options for 'submariner-operator-bundle' image
+ifeq ($(IS_SEMANTIC_VERSION),true)
+BUNDLE_VERSION := $(VERSION)
+else
+BUNDLE_VERSION := $(shell (git describe --abbrev=0 --tags --match=v[0-9]*\.[0-9]*\.[0-9]* 2>/dev/null || echo v9.9.9) \
+| cut -d'-' -f1 | cut -c2-)
+endif
+FROM_VERSION ?= $(shell (git tag -l --sort=-v:refname v[0-9]*\.[0-9]*\.[0-9]* | awk '/^$(BUNDLE_VERSION)$$/ { seen = 1; next } seen { print; exit } END { exit !seen }' || echo v0.0.0) \
+          | head -n1 | cut -d'-' -f1 | cut -c2-)
+SHORT_VERSION := $(shell echo ${BUNDLE_VERSION} | cut -d'.' -f1,2)
+CHANNEL ?= alpha-$(SHORT_VERSION)
+CHANNELS ?= $(CHANNEL)
+DEFAULT_CHANNEL ?= $(CHANNEL)
 
 # CHANNELS define the bundle channels used in the bundle.
 # Add a new line here if you would like to change its default config. (E.g CHANNELS = "candidate,fast,stable")
@@ -24,6 +95,7 @@ BUNDLE_DEFAULT_CHANNEL := --default-channel=$(DEFAULT_CHANNEL)
 endif
 BUNDLE_METADATA_OPTS ?= $(BUNDLE_CHANNELS) $(BUNDLE_DEFAULT_CHANNEL)
 
+############################################################################################
 # IMAGE_TAG_BASE defines the docker.io namespace and part of the image name for remote images.
 # This variable is used to construct full image tags for bundle and catalog images.
 #
@@ -46,18 +118,80 @@ ifeq ($(USE_IMAGE_DIGESTS), true)
 	BUNDLE_GEN_FLAGS += --use-image-digests
 endif
 
+###############################################################################################
 # Image URL to use all building/pushing image targets
-IMG ?= controller:latest
-# ENVTEST_K8S_VERSION refers to the version of kubebuilder assets to be downloaded by envtest binary.
-ENVTEST_K8S_VERSION = 1.23
+REPO ?= quay.io/submariner
+IMG ?= $(REPO)/submariner-operator:$(VERSION)
+# Produce v1 CRDs, requiring Kubernetes 1.16 or later
+CRD_OPTIONS ?= "crd:crdVersions=v1,trivialVersions=false"
 
 # Get the currently used golang install path (in GOPATH/bin, unless GOBIN is set)
-ifeq (,$(shell go env GOBIN))
-GOBIN=$(shell go env GOPATH)/bin
+ifeq (,$(shell $(GO) env GOBIN))
+GOBIN=$(shell $(GO) env GOPATH)/bin
 else
-GOBIN=$(shell go env GOBIN)
+GOBIN=$(shell $(GO) env GOBIN)
 endif
 
+# Ensure we prefer binaries we build
+export PATH := $(CURDIR)/bin:$(PATH)
+
+# Targets to make
+
+images: build
+
+e2e: deploy
+	scripts/kind-e2e/e2e.sh $(E2E_ARGS)
+
+clean:
+	rm -f bin/submariner-operator
+
+licensecheck: BUILD_ARGS=--noupx
+licensecheck: build bin/submariner-operator | bin/lichen
+	bin/lichen -c .lichen.yaml bin/submariner-operator
+
+bin/lichen: $(VENDOR_MODULES)
+	mkdir -p $(@D)
+	$(GO) build -o $@ github.com/uw-labs/lichen
+
+package/Dockerfile.submariner-operator: bin/submariner-operator
+
+package/Dockerfile.submariner-operator-index: packagemanifests
+
+# Generate the clientset for the Submariner APIs
+# It needs to be run when the Submariner APIs change
+generate-clientset: $(VENDOR_MODULES)
+	git clone https://github.com/kubernetes/code-generator -b kubernetes-1.24.1 $${GOPATH}/src/k8s.io/code-generator
+	cd $${GOPATH}/src/k8s.io/code-generator && $(GO) mod vendor
+	GO111MODULE=on $${GOPATH}/src/k8s.io/code-generator/generate-groups.sh \
+		client,deepcopy \
+		github.com/submariner-io/submariner-operator/pkg/client \
+		github.com/submariner-io/submariner-operator/api \
+		submariner:v1alpha1
+
+golangci-lint: $(EMBEDDED_YAMLS)
+
+unit: $(EMBEDDED_YAMLS)
+
+# Generate embedded YAMLs
+EMBEDDED_YAMLS := pkg/embeddedyamls/yamls.go
+$(EMBEDDED_YAMLS): pkg/embeddedyamls/generators/yamls2go.go deploy/crds/submariner.io_servicediscoveries.yaml deploy/crds/submariner.io_brokers.yaml deploy/crds/submariner.io_submariners.yaml deploy/submariner/crds/submariner.io_clusters.yaml deploy/submariner/crds/submariner.io_endpoints.yaml deploy/submariner/crds/submariner.io_gateways.yaml $(shell find deploy/ -name "*.yaml") $(shell find config/rbac/ -name "*.yaml") $(VENDOR_MODULES) $(CONTROLLER_DEEPCOPY)
+	$(GO) generate pkg/embeddedyamls/generate.go
+
+bin/submariner-operator: $(VENDOR_MODULES) main.go $(EMBEDDED_YAMLS)
+	${SCRIPTS_DIR}/compile.sh \
+	--ldflags "-X=github.com/submariner-io/submariner-operator/pkg/version.Version=$(VERSION)" \
+	$@ . $(BUILD_ARGS)
+
+ci: $(EMBEDDED_YAMLS) golangci-lint markdownlint unit build images
+
+# test if VERSION matches the semantic versioning rule
+is-semantic-version:
+    ifneq ($(IS_SEMANTIC_VERSION),true)
+	    $(error 'ERROR: VERSION "$(BUNDLE_VERSION)" does not match the format required by operator-sdk.')
+    endif
+
+.PHONY: build ci clean generate-clientset bundle packagemanifests kustomization is-semantic-version olm scorecard
+##################################################################################################
 # Setting SHELL to bash allows bash commands to be executed by recipes.
 # This is a requirement for 'setup-envtest.sh' in the test target.
 # Options are set to exit when a recipe line exits non-zero or a piped command fails.
@@ -66,23 +200,6 @@ SHELL = /usr/bin/env bash -o pipefail
 
 .PHONY: all
 all: build
-
-##@ General
-
-# The help target prints out all targets with their descriptions organized
-# beneath their categories. The categories are represented by '##@' and the
-# target descriptions by '##'. The awk commands is responsible for reading the
-# entire set of makefiles included in this invocation, looking for lines of the
-# file as xyz: ## something, and then pretty-format the target and help. Then,
-# if there's a line with ##@ something, that gets pretty-printed as a category.
-# More info on the usage of ANSI control characters for terminal formatting:
-# https://en.wikipedia.org/wiki/ANSI_escape_code#SGR_parameters
-# More info on the awk command:
-# http://linuxcommand.org/lc3_adv_awk.php
-
-.PHONY: help
-help: ## Display this help.
-	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^[a-zA-Z_0-9-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
 
 ##@ Development
 
@@ -234,3 +351,21 @@ catalog-build: opm ## Build a catalog image.
 .PHONY: catalog-push
 catalog-push: ## Push a catalog image.
 	$(MAKE) docker-push IMG=$(CATALOG_IMG)
+
+#######################################################################################################
+else
+
+# Not running in Dapper
+
+Makefile.dapper:
+	@echo Downloading $@
+	@curl -sfLO https://raw.githubusercontent.com/submariner-io/shipyard/$(BASE_BRANCH)/$@
+
+include Makefile.dapper
+
+.PHONY: deploy bundle packagemanifests kustomization is-semantic-version licensecheck
+
+endif
+
+# Disable rebuilding Makefile
+Makefile Makefile.inc: ;
