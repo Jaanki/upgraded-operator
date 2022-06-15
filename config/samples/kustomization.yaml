@@ -2,4 +2,5 @@
 resources:
 - _v1alpha1_broker.yaml
 - _v1alpha1_submariner.yaml
+- _v1alpha1_servicediscovery.yaml
 #+kubebuilder:scaffold:manifestskustomizesamples

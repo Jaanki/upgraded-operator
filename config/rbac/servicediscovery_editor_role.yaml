@@ -1,0 +1,24 @@
+# permissions for end users to edit servicediscoveries.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: servicediscovery-editor-role
+rules:
+- apiGroups:
+  - submariner.io
+  resources:
+  - servicediscoveries
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - submariner.io
+  resources:
+  - servicediscoveries/status
+  verbs:
+  - get

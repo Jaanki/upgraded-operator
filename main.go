@@ -19,8 +19,9 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/submariner-io/submariner-operator/controllers/submariner"
 	"os"
+
+	"github.com/submariner-io/submariner-operator/controllers/submariner"
 
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 
@@ -102,6 +103,13 @@ func main() {
 		Scheme: mgr.GetScheme(),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "Submariner")
+		os.Exit(1)
+	}
+	if err = (&controllers.ServiceDiscoveryReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "ServiceDiscovery")
 		os.Exit(1)
 	}
 	//+kubebuilder:scaffold:builder

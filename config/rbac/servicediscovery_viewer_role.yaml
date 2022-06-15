@@ -1,0 +1,20 @@
+# permissions for end users to view servicediscoveries.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: servicediscovery-viewer-role
+rules:
+- apiGroups:
+  - submariner.io
+  resources:
+  - servicediscoveries
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - submariner.io
+  resources:
+  - servicediscoveries/status
+  verbs:
+  - get

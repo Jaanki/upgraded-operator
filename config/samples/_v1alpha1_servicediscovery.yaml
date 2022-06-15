@@ -1,0 +1,6 @@
+apiVersion: submariner.io/v1alpha1
+kind: ServiceDiscovery
+metadata:
+  name: servicediscovery-sample
+spec:
+  # TODO(user): Add fields here
