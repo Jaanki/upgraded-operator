@@ -34,6 +34,32 @@ rules:
 - apiGroups:
   - submariner.io
   resources:
+  - servicediscoveries
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - submariner.io
+  resources:
+  - servicediscoveries/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - submariner.io
+  resources:
+  - servicediscoveries/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - submariner.io
+  resources:
   - submariners
   verbs:
   - create
